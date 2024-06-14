@@ -16,8 +16,8 @@ export async function createQrCode(data) {
         fs.mkdirSync(path.dirname(qrCodePath), { recursive: true });
         await QRCode.toFile(qrCodePath, data);
 
-        //const [rows] = await pool.query(`SELECT * FROM qr_code WHERE qrcode_id = ?`, [id]);
-        //return rows[0];
+        const [rows] = await pool.query(`SELECT * FROM qr_code WHERE qrcode_id = ?`, [id]);
+        return rows[0];
         
     } catch (error) {
         console.error('Error creating QR code:', error.message);
