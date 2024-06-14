@@ -41,7 +41,7 @@ CREATE TABLE `camion` (
 DROP TABLE IF EXISTS `chaffeur`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `chaffeur` (
+CREATE TABLE `choffeur` (
   `chaffeur_id` int NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) DEFAULT NULL,
   `prenom` varchar(255) DEFAULT NULL,
