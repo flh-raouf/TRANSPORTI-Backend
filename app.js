@@ -1,6 +1,6 @@
 import express from 'express';
 import QrCodegenerate from './Routes/QRcodeRoute.js';
- import camionRoute from './Routes/camion.js';
+ import camionRoute from './Routes/camionRoute.js';
 const app = express();
 
 app.use(express.json());
