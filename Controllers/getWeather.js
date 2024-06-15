@@ -14,9 +14,9 @@ const getWeatherCondition = (data) => {
         return 'Neigeux';
     } else if (precipitationType === 2) { // Rain
         return 'Pluvieux';
-    } else if (cloudCover > 80) { // Cloudy
+    } else if (cloudCover > 70) { // Cloudy
         return 'Nuageux';
-    } else if (windSpeed > 10) { // Windy, the threshold is set as an example
+    } else if (windSpeed > 7) { // Windy, the threshold is set as an example
         return 'Venteux';
     } else { // Default to Sunny
         return 'Ensoleillé';
@@ -41,7 +41,7 @@ const getWeather = async (req, res) => {
             }
         };
 
-        const response = await fetch(`https://api.tomorrow.io/v4/weather/realtime?location=${City}&apikey=${process.env.TOMMOROW_API_KEY}`, options);
+        const response = await fetch(`https://api.tomorrow.io/v4/weather/realtime?location=${City}&units=metric&apikey=${process.env.TOMMOROW_API_KEY}`, options);
         const data = await response.json();
         
         
@@ -52,7 +52,7 @@ const getWeather = async (req, res) => {
             // Update the meteo column in the barage_table
             await pool.query('UPDATE barage_table SET meteo = ? WHERE barage_id = ?', [weatherCondition, barageId]);
 
-            res.status(200).json({ weather: weatherCondition /*, data*/});
+            res.status(200).json({ weather: weatherCondition , data});
             
 
         } else {

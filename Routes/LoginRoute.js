@@ -1,10 +1,8 @@
 import express from 'express';
-import getCamion from '../Controllers/getCamion.js';
-
+import { login } from '../Controllers/login.js';
 
 const router = express.Router();
 
-router.post('/camion', getCamion);
+router.post('/login' , login);
 
 export default router;
-
