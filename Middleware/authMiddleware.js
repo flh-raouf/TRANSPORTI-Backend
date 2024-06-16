@@ -1,24 +1,22 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import UnauthenticatedError from '../Errors/UnauthenticatedError.js';
 
 const authenticateUser = (req, res, next) => {
-    const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Authentication invalid' });
-    }
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new UnauthenticatedError('Authentication invalid');
+  }
 
-    const token = authHeader.split(' ')[1];
+  const token = authHeader.split(' ')[1];
 
-    try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = { barage_id: payload.barage_id };
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: 'Authentication invalid' });
-    }
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { barage_id: payload.barage_id };
+    next();
+  } catch (error) {
+    throw new UnauthenticatedError('Authentication invalid');
+  }
 };
 
-export { authenticateUser };
+export default authenticateUser;
