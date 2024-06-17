@@ -1,6 +1,7 @@
 import pool from '../DB/connect.js';
 import bcrypt from 'bcryptjs';
 import generateCodeQr from '../Util/generateQrCode.js';
+import { StatusCodes } from 'http-status-codes'
 
 const AddCamion = async (req, res) => {
 
@@ -20,7 +21,7 @@ const AddCamion = async (req, res) => {
     } catch (error) {
 
         console.error(error);
-        res.status(500).send('Internal Server Error');
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send('Internal Server Error');
 
     }
 

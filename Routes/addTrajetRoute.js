@@ -1,9 +1,9 @@
 import express from 'express';
-import getCamion from '../Controllers/getCamion.js';
+import AddTrajet from '../Controllers/addTrajet.js';
 import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/getCamion' , authenticateUser , getCamion);
+router.post('/addTrajet' , authenticateUser , AddTrajet);
 
 export default router;
