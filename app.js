@@ -1,19 +1,19 @@
 import express from 'express';
-import QrCodegenerate from './Routes/QRcodeRoute.js';
-import getCamion from './Routes/CamionRoute.js';
-import getWeather from './Routes/WeatherRoute.js';
-import loginRoute from './Routes/LoginRoute.js';
+import getCamion from './Routes/getCamionRoute.js';
+import getWeather from './Routes/getWeatherRoute.js';
+import login from './Routes/LoginRoute.js';
+import addCamion from './Routes/AddCamionRoute.js';
 
 
 const app = express();
 
 app.use(express.json());
 
-app.use('/api', loginRoute);
-
-app.use('/api/qrcode',QrCodegenerate);
+app.use('/api', login);
 
 app.use('/api/camion', getCamion );
+
+app.use('/api/camion', addCamion );
 
 app.use('/api/weather', getWeather);
 

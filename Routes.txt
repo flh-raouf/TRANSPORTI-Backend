@@ -1,5 +1,0 @@
-
-http://localhost:8080/api/login
-http://localhost:8080/api/weather/getWeather
-http://localhost:8080/api/camion/getCamion
-http://localhost:8080/api/qrcode/qrcodegenerate

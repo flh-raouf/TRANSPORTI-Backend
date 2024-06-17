@@ -6,18 +6,15 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
-const generateCodeQr = 
-    async (req, res) => {
+const generateCodeQr = async (data, res) => {
         try {
-            
-            const { data } = req.body;
     
             if (!data) {
                 return res.status(400).send('Data is required');
             }
     
             const qrCodeUrl = await QRCode.toDataURL(data);
-            const [result] = await pool.query(`INSERT INTO qr_code (qrcode_img) VALUES (?)`, [qrCodeUrl]);
+            const [result] = await pool.query(`INSERT INTO qr_code (qrcode_img , camion_id ) VALUES (?, ?)`, [qrCodeUrl , data]);
             const id = result.insertId;
     
             const qrCodePath = path.join(__dirname, '../qrcodes', `Qrcode${id}.png`);
