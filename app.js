@@ -1,10 +1,11 @@
 import express from 'express';
 import getCamion from './Routes/getCamionRoute.js';
 import getWeather from './Routes/getWeatherRoute.js';
-import loginBarage from './Routes/LoginBarageRoute.js';
-import addCamion from './Routes/AddCamionRoute.js';
+import loginBarage from './Routes/loginBarageRoute.js';
+import addCamion from './Routes/addCamionRoute.js';
 import addTrajet from './Routes/addTrajetRoute.js';
 import authEntreprise from './Routes/authEntrepriseRoute.js';
+import addAccident from './Routes/addAccidentRoute.js';
 
 
 const app = express();
@@ -22,6 +23,8 @@ app.use('/api/camion', addCamion );
 app.use('/api/trajet' ,addTrajet);
 
 /***************************************************** */
+
+app.use('/api/accident', addAccident);
 
 app.use('/api/camion', getCamion );
 
