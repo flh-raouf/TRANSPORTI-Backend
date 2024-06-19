@@ -1,9 +1,9 @@
 import express from 'express';
-import getCamion from '../Controllers/getCamion.js';
+import ScanQrCode from '../Controllers/scanQrCode.js';
 import authenticateUser from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/getCamion' , authenticateUser , getCamion);
+router.get('/scanQrCode' , authenticateUser , ScanQrCode);
 
 export default router;
