@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
-import pool from '../DB/connect.js';
-import getWeatherData from '../Util/getWeather.js';
-import getCamionData from '../Util/getCamion.js';
+import pool from '../../DB/connect.js';
+import getWeatherData from '../../Util/getWeather.js';
+import getCamionData from '../../Util/getCamion.js';
 
 const scanQrCode = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import bcrypt from 'bcryptjs';
-import generateCodeQr from '../Util/generateQrCode.js';
+import generateCodeQr from '../../Util/generateQrCode.js';
 import { StatusCodes } from 'http-status-codes'
 import jwt from 'jsonwebtoken';
 

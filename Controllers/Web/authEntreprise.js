@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating random strings
 
