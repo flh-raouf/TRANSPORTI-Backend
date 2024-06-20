@@ -15,11 +15,9 @@ const validateRequest = (validations) => {
 
 const validateAddCamion = [
   body('num_carte_grise').notEmpty().withMessage('Carte grise number is required'),
-  body('num_control_tech_vehicule').notEmpty().withMessage('Control technique vehicle number is required'),
-  body('date_control_tech_vehicule').isDate().withMessage('Valid control technique vehicle date is required'),
-  body('num_control_tech_citerne').notEmpty().withMessage('Control technique citerne number is required'),
-  body('date_control_tech_citerne').isDate().withMessage('Valid control technique citerne date is required'),
-  body('type_vehicule').notEmpty().withMessage('Vehicle type is required')
+  body('type_camion').notEmpty().withMessage('Camion type is required'),
+  body('num_ctrl_tech_camion').notEmpty().withMessage('Control technique camion number is required'),
+  body('date_ctrl_tech_camion').isDate({ format: 'YYYY-MM-DD' }).withMessage('Valid control technique camion date is required')
 ];
 
 
@@ -29,19 +27,27 @@ const validateAddTrajet = [
   body('chauffeurs.*.nom').notEmpty().withMessage('Chauffeur nom is required'),
   body('chauffeurs.*.prenom').notEmpty().withMessage('Chauffeur prenom is required'),
   body('chauffeurs.*.num_attestation').notEmpty().withMessage('Chauffeur num_attestation is required'),
-  body('chauffeurs.*.num_brevet_marchendise').notEmpty().withMessage('Chauffeur num_brevet_marchendise is required'),
-  body('chauffeurs.*.num_brevet_metiere_dangeureuse').notEmpty().withMessage('Chauffeur num_brevet_metiere_dangeureuse is required'),
+  body('chauffeurs.*.num_brevet_matiere_dangeureuse').notEmpty().withMessage('Chauffeur num_brevet_matiere_dangeureuse is required'),
+  body('chauffeurs.*.photo_conducteur').notEmpty().withMessage('Chauffeur photo_conducteur is required'),
+  body('chauffeurs.*.source').notEmpty().withMessage('Chauffeur source is required'),
+  body('chauffeurs.*.destination').notEmpty().withMessage('Chauffeur destination is required'),
+  body('chauffeurs.*.date_heure_sortie').optional().isISO8601().withMessage('Chauffeur date_heure_sortie must be a valid datetime'),
+  body('chauffeurs.*.date_heure_arrive_prevu').isISO8601().withMessage('Chauffeur date_heure_arrive_prevu must be a valid datetime'),
+  
   body('matieres').isArray({ min: 1 }).withMessage('matieres must be an array with at least one element'),
   body('matieres.*.class').notEmpty().withMessage('Matiere class is required'),
-  body('matieres.*.pectorgramme').notEmpty().withMessage('Matiere pectorgramme is required'),
+  body('matieres.*.pictogramme').notEmpty().withMessage('Matiere pictogramme is required'),
+  body('matieres.*.type').notEmpty().withMessage('Matiere type is required'),
   body('matieres.*.code_classification').notEmpty().withMessage('Matiere code_classification is required'),
+  body('matieres.*.quantite').notEmpty().withMessage('Matiere quantite is required'),
   body('matieres.*.grp_emballage').notEmpty().withMessage('Matiere grp_emballage is required'),
-  body('matieres.*.qt_lim_excepte').notEmpty().withMessage('Matiere qt_lim_excepte is required'),
-  body('matieres.*.code_restriction').notEmpty().withMessage('Matiere code_restriction is required'),
-  body('matieres.*.num_auth_produit').notEmpty().withMessage('Matiere num_auth_produit is required'),
-  body('matieres.*.inst_emballage').notEmpty().withMessage('Matiere inst_emballage is required'),
-  body('matieres.*.inst_special').notEmpty().withMessage('Matiere inst_special is required'),
-  body('matieres.*.code_citerne').notEmpty().withMessage('Matiere code_citerne is required')
+  body('matieres.*.code_restriction_tunnel').notEmpty().withMessage('Matiere code_restriction_tunnel is required'),
+  body('matieres.*.code_danger').notEmpty().withMessage('Matiere code_danger is required'),
+  body('matieres.*.num_onu').notEmpty().withMessage('Matiere num_onu is required'),
+  body('matieres.*.num_ctrl_tech_citerne').isInt().withMessage('Matiere num_ctrl_tech_citerne must be an integer'),
+  body('matieres.*.date_ctrl_tech_citerne').isISO8601().withMessage('Matiere date_ctrl_tech_citerne must be a valid date'),
+  body('matieres.*.num_assurance_citerne').isInt().withMessage('Matiere num_assurance_citerne must be an integer'),
+  body('matieres.*.date_assurance_citerne').isISO8601().withMessage('Matiere date_assurance_citerne must be a valid date')
 ];
 
 

@@ -1,46 +1,57 @@
 import pool from '../../DB/connect.js';
-import { StatusCodes } from 'http-status-codes'
+import { StatusCodes } from 'http-status-codes';
 
-const AddTrajet = async (req , res) =>{
+const AddTrajet = async (req, res) => {
+    const { camion_id, chauffeurs, matieres } = req.body;
 
-    const { camion_id , chauffeurs , matieres } = req.body
+    if (!camion_id || !chauffeurs || !matieres) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Please provide camion_id, chauffeurs and matieres' });
+    }
 
-        if (!camion_id || !chauffeurs || !matieres) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Please provide camion_id, chauffeurs and matieres' });
+    try {
+        await pool.query('DELETE FROM chauffeur WHERE camion_id = ?', [camion_id]);
+        await pool.query('DELETE FROM matiere WHERE camion_id = ?', [camion_id]);
+
+        for (const chauffeur of chauffeurs) {
+            const {
+                nom, prenom, num_attestation, num_brevet_matiere_dangeureuse, photo_conducteur,
+                source, destination, date_heure_sortie, date_heure_arrive_prevu
+            } = chauffeur;
+
+            const photoConducteurBuffer = Buffer.from(photo_conducteur);
+
+            await pool.query(
+                `INSERT INTO chauffeur 
+                (nom, prenom, num_attestation, num_brevet_matiere_dangeureuse, photo_conducteur, source, destination, date_heure_sortie, date_heure_arrive_prevu, camion_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [nom, prenom, num_attestation, num_brevet_matiere_dangeureuse, photoConducteurBuffer, source, destination, date_heure_sortie, date_heure_arrive_prevu, camion_id]
+            );
         }
 
-        try {
+        for (const matiere of matieres) {
+            const {
+                class: classMatiere, pictogramme, type, code_classification, quantite, grp_emballage,
+                code_restriction_tunnel, code_danger, num_onu, num_ctrl_tech_citerne, date_ctrl_tech_citerne,
+                num_assurance_citerne, date_assurance_citerne
+            } = matiere;
 
-            await pool.query('DELETE FROM chauffeur WHERE camion_id = ?',camion_id);
-            await pool.query('DELETE FROM matiere WHERE camion_id = ?',camion_id);
+            const pictogrammeBuffer = Buffer.from(pictogramme);
 
-            for (const chauffeur of chauffeurs) {
-                const { nom, prenom, num_attestation, num_brevet_marchendise, num_brevet_metiere_dangeureuse } = chauffeur;
-                
-                await pool.query(
-                    'INSERT INTO chauffeur (nom, prenom, num_attestation, num_brevet_marchendise, num_brevet_metiere_dangeureuse , camion_id) VALUES (?, ?, ?, ?, ?, ?)',
-                    [nom, prenom, num_attestation, num_brevet_marchendise, num_brevet_metiere_dangeureuse, camion_id]
-                );
-            }
-
-            for (const matiere of matieres) {
-                const { class:classmatiere, pectorgramme, code_classification, grp_emballage, qt_lim_excepte, code_restriction, num_auth_produit, inst_emballage, inst_special, code_citerne }=matiere;
-                
-                const pectorgrammeBuffer = Buffer.from(pectorgramme);
-                const numAuthProduitBuffer = Buffer.from(num_auth_produit);
-
-                await pool.query(
-                    'INSERT INTO matiere (class, pectorgramme, code_classification, grp_emballage, qt_lim_excepte, code_restriction, num_auth_produit, inst_emballage, inst_special, code_citerne, camion_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    [classmatiere, pectorgrammeBuffer, code_classification, grp_emballage, qt_lim_excepte, code_restriction, numAuthProduitBuffer, inst_emballage, inst_special, code_citerne, camion_id]
-                );
-            }
-
-            res.status(StatusCodes.CREATED).json({ message: 'Trajet added successfully' });
-        } catch (error) {
-            console.error(error);
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+            await pool.query(
+                `INSERT INTO matiere 
+                (class, pictogramme, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu, 
+                num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [classMatiere, pictogrammeBuffer, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
+                 num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id]
+            );
         }
-    
+
+        res.status(StatusCodes.CREATED).json({ message: 'Trajet added successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
+    }
 }
 
 export default AddTrajet;
