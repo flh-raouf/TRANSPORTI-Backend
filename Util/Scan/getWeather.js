@@ -1,7 +1,7 @@
 
 //Tomorrow.io API
 
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import jwt from 'jsonwebtoken';

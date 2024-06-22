@@ -2,6 +2,19 @@ import pool from '../../DB/connect.js';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 
+
+
+function getFreq (freq){
+    if (freq > 10) {
+        return 'Fréquente';
+    } else if (freq <= 10 && freq > 5) {
+        return 'Moyenne';
+    } else {
+        return 'Faible';
+    }
+
+}
+
 const AddAccident = async (req, res) => {
     try {
         const gravite_accident = req.body.gravite_accident;
@@ -17,7 +30,9 @@ const AddAccident = async (req, res) => {
 
 
         const [freqRows] = await pool.query('SELECT COUNT(*) AS freq FROM accident_table WHERE barage_id = ?', [barageId]);
-        const freq = freqRows[0].freq;
+        const frequence = freqRows[0].freq;
+        const freq = getFreq(frequence);
+
 
         const [gravRows] = await pool.query('SELECT gravite_accident, COUNT(*) AS grav_count FROM accident_table GROUP BY gravite_accident ORDER BY grav_count DESC LIMIT 1');
         const grav = gravRows[0].gravite_accident;

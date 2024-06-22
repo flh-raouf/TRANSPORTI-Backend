@@ -1,4 +1,4 @@
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import { StatusCodes } from 'http-status-codes';
 
 const getCamionData = async (camion_id) => {

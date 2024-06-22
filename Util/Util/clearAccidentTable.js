@@ -1,4 +1,4 @@
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 
 const clearAccidentTable = async () => {
     try {
