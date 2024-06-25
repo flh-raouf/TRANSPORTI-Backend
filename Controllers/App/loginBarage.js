@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

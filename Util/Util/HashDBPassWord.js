@@ -2,7 +2,7 @@
 // This script is used to hash all the passwords in the database. It is a one-time script and should be run only once.
 
 import bcrypt from 'bcryptjs';
-import pool from '../DB/connect.js';
+import pool from '../../DB/connect.js';
 
 const hashPasswords = async () => {
     const [users] = await pool.query('SELECT barage_id, password FROM barage_table');
