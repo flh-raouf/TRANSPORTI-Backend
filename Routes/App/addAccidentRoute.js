@@ -5,6 +5,6 @@ import { validateRequest ,validateAddAccident } from '../../Middleware/validatio
 
 const router = express.Router();
 
-router.post('/addAccident' ,validateRequest(validateAddAccident), authenticateUser , AddAccident);
+router.post('/addAccident' ,validateRequest(validateAddAccident), /*authenticateUser ,*/ AddAccident);
 
 export default router;
