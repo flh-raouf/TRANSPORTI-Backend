@@ -18,11 +18,13 @@ function getFreq (freq){
 const AddAccident = async (req, res) => {
     try {
         const gravite_accident = req.body.gravite_accident;
-        
+/*        
         const authHeader = req.headers.authorization;
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const barageId = decoded.barage_id;
+*/
+        const barageId = "B1A"
 
         const insertAccidentSql = 'INSERT INTO accident_table (gravite_accident, barage_id) VALUES (?, ?)';
         await pool.query(insertAccidentSql, [gravite_accident, barageId]);
