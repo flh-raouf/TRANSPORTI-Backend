@@ -1,11 +1,9 @@
 import express from 'express';
-import 'express-async-errors'; // Automatically handle async errors
+import 'express-async-errors';
 import cors from 'cors';
 import helmet from 'helmet';
-import cronJobs from './cronJobs.js';
 import notFoundMiddleware from './Middleware/not-found.js';
 import errorHandlerMiddleware from './Middleware/error-handler.js';
-import authMiddleware from './Middleware/authMiddleware.js';
 import webRoutes from './Routes/Web/index.js';
 import appRoutes from './Routes/App/index.js';
 
