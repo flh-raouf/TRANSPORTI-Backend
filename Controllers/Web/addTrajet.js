@@ -30,7 +30,7 @@ const AddTrajet = async (req, res) => {
 
         for (const matiere of matieres) {
             const {
-                class: classMatiere, pictogramme, type, code_classification, quantite, grp_emballage,
+                nom , class: classMatiere, pictogramme, type, code_classification, quantite, grp_emballage,
                 code_restriction_tunnel, code_danger, num_onu, num_ctrl_tech_citerne, date_ctrl_tech_citerne,
                 num_assurance_citerne, date_assurance_citerne
             } = matiere;
@@ -39,10 +39,10 @@ const AddTrajet = async (req, res) => {
 
             await pool.query(
                 `INSERT INTO matiere 
-                (class, pictogramme, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu, 
+                (nom ,class, pictogramme, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu, 
                 num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [classMatiere, pictogrammeBuffer, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
+                [nom , classMatiere, pictogrammeBuffer, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
                  num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id]
             );
         }
