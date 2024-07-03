@@ -5,6 +5,6 @@ import { validateRequest, validateAddTrajet } from '../../Middleware/validationM
 
 const router = express.Router();
 
-router.post('/addTrajet' ,validateRequest(validateAddTrajet), authenticateUser , AddTrajet);
+router.post('/addTrajet' ,/*validateRequest(validateAddTrajet),*/ authenticateUser , AddTrajet);
 
 export default router;
