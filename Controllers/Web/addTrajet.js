@@ -41,7 +41,7 @@ const AddTrajet = async (req, res) => {
                 `INSERT INTO matiere 
                 (nom ,class, pictogramme, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu, 
                 num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?)`,
                 [nom , classMatiere, pictogrammeBuffer, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
                  num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id]
             );
