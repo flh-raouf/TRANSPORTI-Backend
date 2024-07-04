@@ -21,7 +21,7 @@ const getInfo = async (req, res) => {
         const [camionInfo] = await pool.query(sqlCamionInfo, [entreprise_id]);
 
         // Limit the number of camions to 5
-        const limitedCamionInfo = camionInfo//.slice(0, 5);
+        const limitedCamionInfo = camionInfo.slice(0, 5);
 
         // Fetch associated chauffeurs and matieres for each camion
         const camionsWithDetails = await Promise.all(limitedCamionInfo.map(async (camion) => {
@@ -43,8 +43,8 @@ const getInfo = async (req, res) => {
 
             // Limit the number of elements to 5
             
-            const limitedChauffeurInfo = chauffeurInfo//.slice(0, 5);
-            const limitedMatiereInfo = matiereInfo//.slice(0, 5);
+            const limitedChauffeurInfo = chauffeurInfo.slice(0, 5);
+            const limitedMatiereInfo = matiereInfo.slice(0, 5);
 
             // Count the number of matieres for the camion
             const nbrCiterne = limitedMatiereInfo.length;
