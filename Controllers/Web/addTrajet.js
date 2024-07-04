@@ -12,11 +12,17 @@ cloudinary.config({
 });
 
 function extractPublicId(imageUrl) {
-    const parts = imageUrl.split('/');
-    const fileNameWithExtension = parts[parts.length - 1];
-    const publicId = fileNameWithExtension.split('.')[0];
-    return publicId;
+    try {
+        const parts = imageUrl.split('/');
+        const fileNameWithExtension = parts[parts.length - 1];
+        const publicId = fileNameWithExtension.split('.')[0];
+        return publicId;
+    } catch (error) {
+        console.error('Error extracting public_id:', error);
+        return null; // Handle error gracefully if needed
+    }
 }
+
 
 
 
