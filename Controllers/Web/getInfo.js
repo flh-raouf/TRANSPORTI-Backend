@@ -20,8 +20,11 @@ const getInfo = async (req, res) => {
             WHERE entreprise_id = ?`;
         const [camionInfo] = await pool.query(sqlCamionInfo, [entreprise_id]);
 
+        // Limit the number of camions to 5
+        const limitedCamionInfo = camionInfo.slice(0, 5);
+
         // Fetch associated chauffeurs and matieres for each camion
-        const camionsWithDetails = await Promise.all(camionInfo.map(async (camion) => {
+        const camionsWithDetails = await Promise.all(limitedCamionInfo.map(async (camion) => {
             const { camion_id } = camion;
 
             // Fetch chauffeur info for the camion
@@ -38,11 +41,15 @@ const getInfo = async (req, res) => {
                 WHERE camion_id = ?`;
             const [matiereInfo] = await pool.query(sqlMatiereInfo, [camion_id]);
 
+            // Limit the number of elements to 5
+            const limitedChauffeurInfo = chauffeurInfo.slice(0, 5);
+            const limitedMatiereInfo = matiereInfo.slice(0, 5);
+
             // Count the number of matieres for the camion
-            const nbrCiterne = matiereInfo.length;
+            const nbrCiterne = limitedMatiereInfo.length;
 
             // Only include chauffeurs if there are any
-            const chauffeurs = chauffeurInfo.length > 0 ? chauffeurInfo.map(chauffeur => ({
+            const chauffeurs = limitedChauffeurInfo.length > 0 ? limitedChauffeurInfo.map(chauffeur => ({
                 destination: chauffeur.destination,
                 date_heure_sortie: chauffeur.date_heure_sortie,
                 date_heure_arrive_prevu: chauffeur.date_heure_arrive_prevu,
@@ -50,7 +57,7 @@ const getInfo = async (req, res) => {
             })) : null;
 
             // Only include matieres if there are any
-            const matieres = matiereInfo.length > 0 ? matiereInfo.map(matiere => ({
+            const matieres = limitedMatiereInfo.length > 0 ? limitedMatiereInfo.map(matiere => ({
                 pictogramme: matiere.pictogramme // Adjust this based on your actual matiere structure
             })) : null;
 
