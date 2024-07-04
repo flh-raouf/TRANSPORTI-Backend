@@ -28,7 +28,6 @@ const AddTrajet = async (req, res) => {
                 source, destination, date_heure_sortie, date_heure_arrive_prevu
             } = chauffeur;
 
-            // Upload photo to Cloudinary
             let photoConducteurUrl = null;
             if (photo_conducteur) {
                 const uploadResult = await cloudinary.uploader.upload(photo_conducteur, {
@@ -52,14 +51,20 @@ const AddTrajet = async (req, res) => {
                 num_assurance_citerne, date_assurance_citerne
             } = matiere;
 
-            const pictogrammeBuffer = Buffer.from(pictogramme);
+            let pictogrammeUrl = null;
+            if (pictogramme) {
+                const uploadResult = await cloudinary.uploader.upload(pictogramme, {
+                    folder: 'matiere_pictogrammes'
+                });
+                pictogrammeUrl = uploadResult.secure_url;
+            }
 
             await pool.query(
                 `INSERT INTO matiere 
                 (nom, class, pictogramme, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu, 
                 num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [nom, classMatiere, pictogrammeBuffer, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
+                [nom, classMatiere, pictogrammeUrl, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
                  num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id]
             );
         }
