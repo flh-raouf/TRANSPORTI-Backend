@@ -33,10 +33,6 @@ const getImagePublicId = (imageUrl) => {
     return publicId;
 };
 
-
-
-
-
 const AddTrajet = async (req, res) => {
     const { camion_id, chauffeurs, matieres } = req.body;
 
@@ -45,7 +41,7 @@ const AddTrajet = async (req, res) => {
     }
 
     try {
-        // Delete images associated with chauffeurs from Cloudinary
+        // Fetch and delete images associated with chauffeurs from Cloudinary
         const [chauffeurImages] = await pool.query('SELECT photo_conducteur FROM chauffeur WHERE camion_id = ?', [camion_id]);
         await Promise.all(chauffeurImages.map(async (imageRow) => {
             const imageUrl = imageRow.photo_conducteur;
