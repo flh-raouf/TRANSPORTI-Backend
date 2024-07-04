@@ -21,7 +21,7 @@ const getInfo = async (req, res) => {
         const [camionInfo] = await pool.query(sqlCamionInfo, [entreprise_id]);
 
         // Limit the number of camions to 5
-        
+        if (chauffeurs) camionDetails.chauffeurs = chauffeurs;
 
         // Fetch associated chauffeurs and matieres for each camion
         const camionsWithDetails = await Promise.all(limitedCamionInfo.map(async (camion) => {
@@ -71,7 +71,6 @@ const getInfo = async (req, res) => {
             };
 
             // Only include chauffeurs and matieres if they exist
-            if (chauffeurs) camionDetails.chauffeurs = chauffeurs;
             if (matieres) camionDetails.matieres = matieres;
             if (nbrCiterne > 0) camionDetails.nbrCiterne = nbrCiterne;
 
