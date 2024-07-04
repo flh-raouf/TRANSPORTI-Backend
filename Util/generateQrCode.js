@@ -1,9 +1,16 @@
 import pool from '../DB/connect.js';
 import QRCode from 'qrcode';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({ 
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET 
+});
 
 const generateCodeQr = async (data) => {
     try {
@@ -12,12 +19,19 @@ const generateCodeQr = async (data) => {
         }
 
         const qrCodeUrl = await QRCode.toDataURL(data);
-        const [result] = await pool.query(`INSERT INTO qr_code (qrcode_img, camion_id) VALUES (?, ?)`, [qrCodeUrl, data]);
-        const id = result.insertId;
+        
+        // Upload QR code image to Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(qrCodeUrl, {
+            folder: 'qrcodes', // Optional folder in Cloudinary
+            resource_type: 'image' // Set resource type to image
+        });
 
-        const qrCodePath = path.join(__dirname, '../Img/qrcodes', `Qrcode${id}.png`);
-        fs.mkdirSync(path.dirname(qrCodePath), { recursive: true });
-        await QRCode.toFile(qrCodePath, data);
+        // Extract public URL of the uploaded image from Cloudinary response
+        const qrCodeCloudinaryUrl = uploadResult.secure_url;
+
+        // Insert Cloudinary URL into database
+        const [result] = await pool.query(`INSERT INTO qr_code (qrcode_img, camion_id) VALUES (?, ?)`, [qrCodeCloudinaryUrl, data]);
+        const id = result.insertId;
 
         const [rows] = await pool.query(`SELECT * FROM qr_code WHERE qrcode_id = ?`, [id]);
 

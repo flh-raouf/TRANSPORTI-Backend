@@ -11,20 +11,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-function extractPublicId(imageUrl) {
-    try {
-        const parts = imageUrl.split('/');
-        const fileNameWithExtension = parts[parts.length - 1];
-        const publicId = fileNameWithExtension.split('.')[0];
-        return publicId;
-    } catch (error) {
-        console.error('Error extracting public_id:', error);
-        return null; // Handle error gracefully if needed
-    }
-}
-
-
-
 
 const AddTrajet = async (req, res) => {
     const { camion_id, chauffeurs, matieres } = req.body;
@@ -34,16 +20,7 @@ const AddTrajet = async (req, res) => {
     }
 
     try {
-
-        const [chauffeurImages] = await pool.query('SELECT photo_conducteur FROM chauffeur WHERE camion_id = ?', [camion_id]);
-        const [matiereImages] = await pool.query('SELECT pictogramme FROM matiere WHERE camion_id = ?', [camion_id]);
-
-        const publicConductorsIds = chauffeurImages.map(imageUrl => extractPublicId(imageUrl));
-        const publicMatiereIds = matiereImages.map(imageUrl => extractPublicId(imageUrl));
-
-        cloudinary.uploader.destroy(`conducteur_photos/${publicConductorsIds}`)
-        cloudinary.uploader.destroy(`matiere_pictogrammes/${publicMatiereIds}`)
-
+    
         await pool.query('DELETE FROM chauffeur WHERE camion_id = ?', [camion_id]);
         await pool.query('DELETE FROM matiere WHERE camion_id = ?', [camion_id]);
 
