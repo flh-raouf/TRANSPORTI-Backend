@@ -5,33 +5,20 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configure Cloudinary with your credentials
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
     api_key: process.env.CLOUDINARY_API_KEY, 
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-// Function to delete an image from Cloudinary by its URL
-const deleteImageFromCloudinary = async (imageUrl) => {
-    try {
-        const publicId = getImagePublicId(imageUrl);
-        const deletionResult = await cloudinary.uploader.destroy(publicId);
-        console.log(`Deleted image ${publicId} from Cloudinary:`, deletionResult);
-        return deletionResult;
-    } catch (error) {
-        console.error('Error deleting image from Cloudinary:', error);
-        throw error;
-    }
-};
-
-// Function to extract public_id from Cloudinary URL
-const getImagePublicId = (imageUrl) => {
+function extractPublicId(imageUrl) {
     const parts = imageUrl.split('/');
-    const fileName = parts[parts.length - 1]; // e.g., 'example.jpg'
-    const publicId = fileName.split('.')[0]; // remove file extension
+    const fileNameWithExtension = parts[parts.length - 1];
+    const publicId = fileNameWithExtension.split('.')[0];
     return publicId;
-};
+}
+
+
 
 const AddTrajet = async (req, res) => {
     const { camion_id, chauffeurs, matieres } = req.body;
@@ -41,23 +28,20 @@ const AddTrajet = async (req, res) => {
     }
 
     try {
-        // Fetch and delete images associated with chauffeurs from Cloudinary
+
         const [chauffeurImages] = await pool.query('SELECT photo_conducteur FROM chauffeur WHERE camion_id = ?', [camion_id]);
-        await Promise.all(chauffeurImages.map(async (imageRow) => {
-            const imageUrl = imageRow.photo_conducteur;
-            if (imageUrl) {
-                await deleteImageFromCloudinary(imageUrl);
-            }
-        }));
+        const [matiereImages] = await pool.query('SELECT pictogramme FROM matiere WHERE camion_id = ?', [camion_id]);
 
-        // Delete records from chauffeur and matiere tables
-        await Promise.all([
-            pool.query('DELETE FROM chauffeur WHERE camion_id = ?', [camion_id]),
-            pool.query('DELETE FROM matiere WHERE camion_id = ?', [camion_id])
-        ]);
+        const publicConductorsIds = chauffeurImages.map(imageUrl => extractPublicId(imageUrl));
+        const publicMatiereIds = matiereImages.map(imageUrl => extractPublicId(imageUrl));
 
-        // Insert new chauffeurs with possible image uploads
-        await Promise.all(chauffeurs.map(async (chauffeur) => {
+        cloudinary.uploader.destroy(`conducteur_photos/${publicConductorsIds}`)
+        cloudinary.uploader.destroy(`matiere_pictogrammes/${publicMatiereIds}`)
+
+        await pool.query('DELETE FROM chauffeur WHERE camion_id = ?', [camion_id]);
+        await pool.query('DELETE FROM matiere WHERE camion_id = ?', [camion_id]);
+
+        for (const chauffeur of chauffeurs) {
             const {
                 nom, prenom, num_attestation, num_brevet_matiere_dangeureuse, photo_conducteur,
                 source, destination, date_heure_sortie, date_heure_arrive_prevu
@@ -77,10 +61,9 @@ const AddTrajet = async (req, res) => {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [nom, prenom, num_attestation, num_brevet_matiere_dangeureuse, photoConducteurUrl, source, destination, date_heure_sortie, date_heure_arrive_prevu, camion_id]
             );
-        }));
+        }
 
-        // Insert new matieres with possible image uploads
-        await Promise.all(matieres.map(async (matiere) => {
+        for (const matiere of matieres) {
             const {
                 nom, class: classMatiere, pictogramme, type, code_classification, quantite, grp_emballage,
                 code_restriction_tunnel, code_danger, num_onu, num_ctrl_tech_citerne, date_ctrl_tech_citerne,
@@ -103,13 +86,13 @@ const AddTrajet = async (req, res) => {
                 [nom, classMatiere, pictogrammeUrl, type, code_classification, quantite, grp_emballage, code_restriction_tunnel, code_danger, num_onu,
                  num_ctrl_tech_citerne, date_ctrl_tech_citerne, num_assurance_citerne, date_assurance_citerne, camion_id]
             );
-        }));
+        }
 
         res.status(StatusCodes.CREATED).json({ message: 'Trajet added successfully' });
     } catch (error) {
-        console.error('Error adding trajet:', error);
+        console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
     }
-};
+}
 
 export default AddTrajet;
