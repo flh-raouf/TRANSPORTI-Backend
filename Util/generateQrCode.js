@@ -15,7 +15,7 @@ const generateCodeQr = async (data) => {
         const [result] = await pool.query(`INSERT INTO qr_code (qrcode_img, camion_id) VALUES (?, ?)`, [qrCodeUrl, data]);
         const id = result.insertId;
 
-        const qrCodePath = path.join(__dirname, '../QrCodes', `Qrcode${id}.png`);
+        const qrCodePath = path.join(__dirname, '../Img/qrcodes', `Qrcode${id}.png`);
         fs.mkdirSync(path.dirname(qrCodePath), { recursive: true });
         await QRCode.toFile(qrCodePath, data);
 
