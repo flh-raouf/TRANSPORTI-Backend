@@ -33,9 +33,7 @@ const generateCodeQr = async (data) => {
         const [result] = await pool.query(`INSERT INTO qr_code (qrcode_img, camion_id) VALUES (?, ?)`, [qrCodeCloudinaryUrl, data]);
         const id = result.insertId;
 
-        const [rows] = await pool.query(`SELECT * FROM qr_code WHERE qrcode_id = ?`, [id]);
-
-        return rows[0]; // Return the inserted row from qr_code table
+        return qrCodeCloudinaryUrl; // Return the Cloudinary URL where the QR code is stored
     } catch (error) {
         console.error(error);
         throw error; // Throw the error so it can be handled by the caller (AddCamion controller)
