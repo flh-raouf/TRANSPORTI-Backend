@@ -63,6 +63,7 @@ const getInfo = async (req, res) => {
                 
                     // Construct the camion details object
                     const camionDetails = {
+                        camion_id : camion.camion_id,
                         num_carte_grise: camion.num_carte_grise,
                         type_camion: camion.type_camion,
                         num_ctrl_tech_camion: camion.num_ctrl_tech_camion,
