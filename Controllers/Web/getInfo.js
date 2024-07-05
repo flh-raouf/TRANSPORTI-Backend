@@ -20,63 +20,67 @@ const getInfo = async (req, res) => {
             WHERE entreprise_id = ?`;
         const [camionInfo] = await pool.query(sqlCamionInfo, [entreprise_id]);
 
-        // Limit the number of camions to 5
-        const limitedCamionInfo = camionInfo.slice(0, 5);
 
         // Fetch associated chauffeurs and matieres for each camion
-        const camionsWithDetails = await Promise.all(limitedCamionInfo.map(async (camion) => {
-            const { camion_id } = camion;
+    
+        const camionsWithDetails = [];
 
-            // Fetch chauffeur info for the camion
-            const sqlChauffeurInfo = `
-                SELECT destination, date_heure_sortie, date_heure_arrive_prevu, CONCAT(nom, ' ', prenom) AS nom_complet 
-                FROM chauffeur 
-                WHERE camion_id = ?`;
-            const [chauffeurInfo] = await pool.query(sqlChauffeurInfo, [camion_id]);
-
-            // Fetch matiere info for the camion
-            const sqlMatiereInfo = `
-                SELECT pictogramme 
-                FROM matiere 
-                WHERE camion_id = ?`;
-            const [matiereInfo] = await pool.query(sqlMatiereInfo, [camion_id]);
-
-            // Limit the number of elements to 5
+            for (const camion of camionInfo) {
+                const { camion_id } = camion;
             
-            const limitedChauffeurInfo = chauffeurInfo.slice(0, 5);
-            const limitedMatiereInfo = matiereInfo.slice(0, 5);
+                try {
+                    // Fetch chauffeur info for the camion
+                    const [chauffeurInfo] = await pool.query(`
+                        SELECT destination, date_heure_sortie, date_heure_arrive_prevu, CONCAT(nom, ' ', prenom) AS nom_complet 
+                        FROM chauffeur 
+                        WHERE camion_id = ?`,
+                        [camion_id]
+                    );
+                
+                    // Fetch matiere info for the camion
+                    const [matiereInfo] = await pool.query(`
+                        SELECT pictogramme 
+                        FROM matiere 
+                        WHERE camion_id = ?`,
+                        [camion_id]
+                    );
+                
+                    // Count the number of matieres for the camion
+                    const nbrCiterne = matiereInfo.length;
+                
+                    // Only include chauffeurs if there are any
+                    const chauffeurs = chauffeurInfo.length > 0 ? chauffeurInfo.map(chauffeur => ({
+                        destination: chauffeur.destination,
+                        date_heure_sortie: chauffeur.date_heure_sortie,
+                        date_heure_arrive_prevu: chauffeur.date_heure_arrive_prevu,
+                        nom_complet: chauffeur.nom_complet
+                    })) : null;
+                
+                    // Only include matieres if there are any
+                    const matieres = matiereInfo.length > 0 ? matiereInfo.map(matiere => ({
+                        pictogramme: matiere.pictogramme // Adjust this based on your actual matiere structure
+                    })) : null;
+                
+                    // Construct the camion details object
+                    const camionDetails = {
+                        num_carte_grise: camion.num_carte_grise,
+                        type_camion: camion.type_camion,
+                        num_ctrl_tech_camion: camion.num_ctrl_tech_camion,
+                        date_ctrl_tech_camion: camion.date_ctrl_tech_camion
+                    };
+                
+                    // Only include chauffeurs and matieres if they exist
+                    if (chauffeurs) camionDetails.chauffeurs = chauffeurs;
+                    if (matieres) camionDetails.matieres = matieres;
+                    if (nbrCiterne > 0) camionDetails.nbrCiterne = nbrCiterne;
+                
+                    camionsWithDetails.push(camionDetails);
+                } catch (error) {
+                    console.error(`Error fetching details for camion ${camion_id}:`, error.message);
+                    // Handle error as needed
+                }
+            }
 
-            // Count the number of matieres for the camion
-            const nbrCiterne = limitedMatiereInfo.length;
-
-            // Only include chauffeurs if there are any
-            const chauffeurs = limitedChauffeurInfo.length > 0 ? limitedChauffeurInfo.map(chauffeur => ({
-                destination: chauffeur.destination,
-                date_heure_sortie: chauffeur.date_heure_sortie,
-                date_heure_arrive_prevu: chauffeur.date_heure_arrive_prevu,
-                nom_complet: chauffeur.nom_complet
-            })) : null;
-
-            // Only include matieres if there are any
-            const matieres = limitedMatiereInfo.length > 0 ? limitedMatiereInfo.map(matiere => ({
-                pictogramme: matiere.pictogramme // Adjust this based on your actual matiere structure
-            })) : null;
-
-            // Construct the camion details object
-            const camionDetails = {
-                num_carte_grise: camion.num_carte_grise,
-                type_camion: camion.type_camion,
-                num_ctrl_tech_camion: camion.num_ctrl_tech_camion,
-                date_ctrl_tech_camion: camion.date_ctrl_tech_camion
-            };
-
-            // Only include chauffeurs and matieres if they exist
-            if (chauffeurs) camionDetails.chauffeurs = chauffeurs;
-            if (matieres) camionDetails.matieres = matieres;
-            if (nbrCiterne > 0) camionDetails.nbrCiterne = nbrCiterne;
-
-            return camionDetails;
-        }));
 
         res.status(StatusCodes.OK).json({
             camions: camionsWithDetails
@@ -88,3 +92,7 @@ const getInfo = async (req, res) => {
 };
 
 export default getInfo;
+
+
+
+  

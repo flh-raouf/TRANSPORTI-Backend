@@ -11,6 +11,26 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
+const deleteImageFromCloudinary = async (publicId, resourceType) => {
+    try {
+        const result = await cloudinary.v2.api.delete_resources(`${resourceType}/${publicId}`, { type: 'upload', resource_type: 'image' });
+        console.log(`Deleted ${result.deleted[publicId].resource_type} with public_id ${publicId}`);
+    } catch (error) {
+        console.error(`Error deleting ${resourceType} with public_id ${publicId}:`, error.message);
+    }
+};
+
+const extractPublicId = (imageUrl) => {
+    try {
+        const parts = imageUrl.split('/');
+        const fileNameWithExtension = parts[parts.length - 1];
+        const publicId = fileNameWithExtension.split('.')[0];
+        return publicId;
+    } catch (error) {
+        console.error('Error extracting public_id:', error);
+        return null; // Handle error gracefully if needed
+    }
+};
 
 const AddTrajet = async (req, res) => {
     const { camion_id, chauffeurs, matieres } = req.body;
@@ -20,7 +40,25 @@ const AddTrajet = async (req, res) => {
     }
 
     try {
-    
+        // Delete images from Cloudinary and then from database
+        const deletionResultsChauffeurs = await Promise.all(chauffeurs.map(async (chauffeur) => {
+            if (chauffeur.photo_conducteur) {
+                const publicId = extractPublicId(chauffeur.photo_conducteur);
+                if (publicId) {
+                    await deleteImageFromCloudinary(publicId, 'conducteur_photos');
+                }
+            }
+        }));
+
+        const deletionResultsMatieres = await Promise.all(matieres.map(async (matiere) => {
+            if (matiere.pictogramme) {
+                const publicId = extractPublicId(matiere.pictogramme);
+                if (publicId) {
+                    await deleteImageFromCloudinary(publicId, 'matiere_pictogrammes');
+                }
+            }
+        }));
+
         await pool.query('DELETE FROM chauffeur WHERE camion_id = ?', [camion_id]);
         await pool.query('DELETE FROM matiere WHERE camion_id = ?', [camion_id]);
 
@@ -76,6 +114,6 @@ const AddTrajet = async (req, res) => {
         console.error(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
     }
-}
+};
 
 export default AddTrajet;
