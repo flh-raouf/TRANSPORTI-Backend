@@ -25,6 +25,7 @@ const extractPublicId = (imageUrl) => {
         const parts = imageUrl.split('/');
         const fileNameWithExtension = parts[parts.length - 1];
         const publicId = fileNameWithExtension.split('.')[0];
+        console.log('Extracted public_id:', publicId);
         return publicId;
     } catch (error) {
         console.error('Error extracting public_id:', error);
