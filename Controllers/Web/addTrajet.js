@@ -13,26 +13,22 @@ cloudinary.config({
 
 const deleteImageFromCloudinary = async (publicId, resourceType) => {
     try {
-        const result = await cloudinary.v2.api.delete_resources(`${resourceType}/${publicId}`, { type: 'upload', resource_type: 'image' });
-        console.log(`Deleted ${result.deleted[publicId].resource_type} with public_id ${publicId}`);
+        const result = await cloudinary.api.delete_resources([`${resourceType}/${publicId}`], { type: 'upload', resource_type: 'image' });
+        console.log(`Deleted ${resourceType} with public_id ${publicId}`);
     } catch (error) {
-        console.error(`Error deleting ${resourceType} with public_id ${publicId}:`, error.message);
+        console.error(`Error deleting ${resourceType} with public_id ${publicId}:`, error.message );
     }
 };
 
+// Function to extract public_id from Cloudinary URL
 const extractPublicId = (imageUrl) => {
     try {
+        // Split the URL by '/' and get the last part
         const parts = imageUrl.split('/');
-        let publicId = parts.pop(); // Get the last part of the URL
-        publicId = publicId.split('.')[0]; // Remove the file extension if present
+        let lastPart = parts.pop();
 
-        // Check if the publicId includes a version number
-        const versionIndex = publicId.indexOf('/v');
-        if (versionIndex !== -1) {
-            publicId = publicId.substring(publicId.lastIndexOf('/') + 1, versionIndex);
-        } else {
-            publicId = publicId.substring(publicId.lastIndexOf('/') + 1);
-        }
+        // Remove the file extension (e.g., '.jpg', '.png') if present
+        const publicId = lastPart.split('.')[0];
 
         return publicId;
     } catch (error) {
@@ -51,22 +47,37 @@ const AddTrajet = async (req, res) => {
     try {
         // Delete images from Cloudinary and then from database
         const deletionResultsChauffeurs = await Promise.all(chauffeurs.map(async (chauffeur) => {
-            if (chauffeur.photo_conducteur) {
-                const publicId = extractPublicId(chauffeur.photo_conducteur);
-                if (publicId) {
-                    await deleteImageFromCloudinary(publicId, 'conducteur_photos');
+            try {
+                const [rows] = await pool.query('SELECT photo_conducteur FROM chauffeur WHERE camion_id = ?', [camion_id]);
+                if (rows.length > 0 && rows[0].photo_conducteur) {
+                    const imageUrl = rows[0].photo_conducteur;
+                    const publicId = extractPublicId(imageUrl);
+                    if (publicId) {
+                        await deleteImageFromCloudinary(publicId, 'conducteur_photos');
+                    }
                 }
+            } catch (error) {
+                console.error('Error fetching and deleting photo_conducteur:', error);
+            }
+        }));
+        
+        const deletionResultsMatieres = await Promise.all(matieres.map(async (matiere) => {
+            try {
+                const [rows] = await pool.query('SELECT pictogramme FROM matiere WHERE camion_id = ?', [camion_id]);
+                if (rows.length > 0 && rows[0].pictogramme) {
+                    const imageUrl = rows[0].pictogramme;
+                    const publicId = extractPublicId(imageUrl);
+                    if (publicId) {
+                        await deleteImageFromCloudinary(publicId, 'matiere_pictogrammes');
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching and deleting pictogramme:', error);
             }
         }));
 
-        const deletionResultsMatieres = await Promise.all(matieres.map(async (matiere) => {
-            if (matiere.pictogramme) {
-                const publicId = extractPublicId(matiere.pictogramme);
-                if (publicId) {
-                    await deleteImageFromCloudinary(publicId, 'matiere_pictogrammes');
-                }
-            }
-        }));
+
+        
 
         await pool.query('DELETE FROM chauffeur WHERE camion_id = ?', [camion_id]);
         await pool.query('DELETE FROM matiere WHERE camion_id = ?', [camion_id]);
