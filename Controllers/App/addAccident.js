@@ -14,14 +14,18 @@ function getFreq(freq) {
 
 const AddAccident = async (req, res) => {
     try {
-        const { gravite_accident, accident_date, accident_time } = req.body;
-        /*
         const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Authentication token missing or invalid' });
+        }
+      
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const barageId = decoded.barage_id;
-        */
-        const barageId = "B1A"; // Temporary barageId for testing
+       
+        
+        const { gravite_accident, accident_date, accident_time } = req.body;
+
 
         const insertAccidentSql = 'INSERT INTO accident_table (gravite_accident, accident_date, accident_time, barage_id) VALUES (?, ?, ?, ?)';
         await pool.query(insertAccidentSql, [gravite_accident, accident_date, accident_time, barageId]);

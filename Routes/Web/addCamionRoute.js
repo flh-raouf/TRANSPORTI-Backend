@@ -5,6 +5,6 @@ import { validateRequest, validateAddCamion } from '../../Middleware/validationM
 
 const router = express.Router();
 
-router.post('/addCamion' , /*validateRequest(validateAddCamion),*/ authenticateUser , AddCamion);
+router.post('/addCamion' , validateRequest(validateAddCamion), authenticateUser , AddCamion);
 
 export default router;

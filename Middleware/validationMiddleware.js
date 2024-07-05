@@ -35,6 +35,7 @@ const validateAddTrajet = [
   body('chauffeurs.*.date_heure_arrive_prevu').isISO8601().withMessage('Chauffeur date_heure_arrive_prevu must be a valid datetime'),
   
   body('matieres').isArray({ min: 1 }).withMessage('matieres must be an array with at least one element'),
+  body('matieres.*.nom').notEmpty().withMessage('Matiere nom is required'),
   body('matieres.*.class').notEmpty().withMessage('Matiere class is required'),
   body('matieres.*.pictogramme').notEmpty().withMessage('Matiere pictogramme is required'),
   body('matieres.*.type').notEmpty().withMessage('Matiere type is required'),
@@ -71,12 +72,20 @@ const validateLoginBarage = [
 
 
 const validateAddAccident = [
-  body('gravite_accident').notEmpty().withMessage('Accident severity is required')
+  body('gravite_accident').notEmpty().withMessage('Accident severity is required'),
+  body('accident_date').isISO8601().withMessage('Accident date must be a valid date'),
+  body('accident_time').notEmpty().withMessage('Accident time must be a valid time'),
+  
 ];
 
 
 const validateScanQrCode = [
   body('camion_id').notEmpty().withMessage('QR code is required')
+];
+
+
+const validateDelete = [
+  body('camion_id').notEmpty().withMessage('camion_id is required'),
 ];
 
 
@@ -88,5 +97,6 @@ export {
   validateLoginEntreprise,
   validateLoginBarage,
   validateAddAccident,
-  validateScanQrCode
+  validateScanQrCode,
+  validateDelete
 };

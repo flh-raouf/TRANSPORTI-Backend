@@ -5,6 +5,6 @@ import { validateRequest ,validateScanQrCode } from '../../Middleware/validation
 
 const router = express.Router();
 
-router.post('/scanQrCode' ,validateRequest(validateScanQrCode), /*authenticateUser ,*/ ScanQrCode);
+router.post('/scanQrCode' ,validateRequest(validateScanQrCode), authenticateUser , ScanQrCode);
 
 export default router;

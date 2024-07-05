@@ -15,7 +15,7 @@ import EstimRisque from '../../Util/Evaluation/EstimRisque.js';
 
 const scanQrCode = async (req, res) => {
     try {
-        /*const authHeader = req.headers.authorization;
+        const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Authentication token missing or invalid' });
         }
@@ -23,8 +23,7 @@ const scanQrCode = async (req, res) => {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const barage_id = decoded.barage_id;
-*/
-        const barage_id = "B1A"
+
         const { camion_id } = req.body;
    
         // Fetch weather data and camion data

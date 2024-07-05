@@ -3,6 +3,10 @@ import { StatusCodes } from 'http-status-codes';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 
+
+
+
+
 dotenv.config();
 
 cloudinary.config({ 
@@ -10,6 +14,10 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY, 
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
+
+
+
+
 
 const deleteImageFromCloudinary = async (publicId, resourceType) => {
     try {
@@ -36,6 +44,10 @@ const extractPublicId = (imageUrl) => {
         return null; // Handle error gracefully if needed
     }
 };
+
+
+
+
 
 const AddTrajet = async (req, res) => {
     const { camion_id, chauffeurs, matieres } = req.body;
