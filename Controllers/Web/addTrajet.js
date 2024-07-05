@@ -23,9 +23,17 @@ const deleteImageFromCloudinary = async (publicId, resourceType) => {
 const extractPublicId = (imageUrl) => {
     try {
         const parts = imageUrl.split('/');
-        const fileNameWithExtension = parts[parts.length - 1];
-        const publicId = fileNameWithExtension.split('.')[0];
-        console.log('Extracted public_id:', publicId);
+        let publicId = parts.pop(); // Get the last part of the URL
+        publicId = publicId.split('.')[0]; // Remove the file extension if present
+
+        // Check if the publicId includes a version number
+        const versionIndex = publicId.indexOf('/v');
+        if (versionIndex !== -1) {
+            publicId = publicId.substring(publicId.lastIndexOf('/') + 1, versionIndex);
+        } else {
+            publicId = publicId.substring(publicId.lastIndexOf('/') + 1);
+        }
+
         return publicId;
     } catch (error) {
         console.error('Error extracting public_id:', error);
