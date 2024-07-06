@@ -3,9 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 
-
-
-
+import {extractPublicId , deleteImageFromCloudinary} from '../../Util/cloudinaryDelete.js';
 
 dotenv.config();
 
@@ -14,39 +12,6 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY, 
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
-
-
-
-
-
-const deleteImageFromCloudinary = async (publicId, resourceType) => {
-    try {
-        const result = await cloudinary.api.delete_resources([`${resourceType}/${publicId}`], { type: 'upload', resource_type: 'image' });
-        console.log(`Deleted ${resourceType} with public_id ${publicId}`);
-    } catch (error) {
-        console.error(`Error deleting ${resourceType} with public_id ${publicId}:`, error.message );
-    }
-};
-
-// Function to extract public_id from Cloudinary URL
-const extractPublicId = (imageUrl) => {
-    try {
-        // Split the URL by '/' and get the last part
-        const parts = imageUrl.split('/');
-        let lastPart = parts.pop();
-
-        // Remove the file extension (e.g., '.jpg', '.png') if present
-        const publicId = lastPart.split('.')[0];
-
-        return publicId;
-    } catch (error) {
-        console.error('Error extracting public_id:', error);
-        return null; // Handle error gracefully if needed
-    }
-};
-
-
-
 
 
 const AddTrajet = async (req, res) => {
@@ -58,33 +23,24 @@ const AddTrajet = async (req, res) => {
 
     try {
         // Delete images from Cloudinary and then from database
-        const deletionResultsChauffeurs = await Promise.all(chauffeurs.map(async (chauffeur) => {
-            try {
-                const [rows] = await pool.query('SELECT photo_conducteur FROM chauffeur WHERE camion_id = ?', [camion_id]);
-                if (rows.length > 0 && rows[0].photo_conducteur) {
-                    const imageUrl = rows[0].photo_conducteur;
-                    const publicId = extractPublicId(imageUrl);
-                    if (publicId) {
-                        await deleteImageFromCloudinary(publicId, 'conducteur_photos');
-                    }
+        const [chauffeurRows] = await pool.query('SELECT photo_conducteur FROM chauffeur WHERE camion_id = ?', [camion_id]);
+        await Promise.all(chauffeurRows.map(async (row) => {
+            if (row.photo_conducteur) {
+                const publicId = extractPublicId(row.photo_conducteur);
+                if (publicId) {
+                    await deleteImageFromCloudinary(publicId, 'conducteur_photos');
                 }
-            } catch (error) {
-                console.error('Error fetching and deleting photo_conducteur:', error);
             }
         }));
-        
-        const deletionResultsMatieres = await Promise.all(matieres.map(async (matiere) => {
-            try {
-                const [rows] = await pool.query('SELECT pictogramme FROM matiere WHERE camion_id = ?', [camion_id]);
-                if (rows.length > 0 && rows[0].pictogramme) {
-                    const imageUrl = rows[0].pictogramme;
-                    const publicId = extractPublicId(imageUrl);
-                    if (publicId) {
-                        await deleteImageFromCloudinary(publicId, 'matiere_pictogrammes');
-                    }
+
+        // Fetch and delete pictogramme for the given camion_id
+        const [matiereRows] = await pool.query('SELECT pictogramme FROM matiere WHERE camion_id = ?', [camion_id]);
+        await Promise.all(matiereRows.map(async (row) => {
+            if (row.pictogramme) {
+                const publicId = extractPublicId(row.pictogramme);
+                if (publicId) {
+                    await deleteImageFromCloudinary(publicId, 'matiere_pictogrammes');
                 }
-            } catch (error) {
-                console.error('Error fetching and deleting pictogramme:', error);
             }
         }));
 
