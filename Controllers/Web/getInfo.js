@@ -64,7 +64,7 @@ const getInfo = async (req, res) => {
                 
                     // Construct the camion details object
                     const camionDetails = {
-                        qr_code : camion.qrcode_img,
+                        qr_code: camion.qrcode_img,
                         camion_id : camion.camion_id,
                         num_carte_grise: camion.num_carte_grise,
                         type_camion: camion.type_camion,

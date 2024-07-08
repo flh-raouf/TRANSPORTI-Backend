@@ -13,7 +13,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-const deleteCamion = async (req , res) => {
+const deleteTrajet = async (req , res) => {
 
     const camion_id = req.body.camion_id;
 
@@ -49,4 +49,4 @@ const deleteCamion = async (req , res) => {
 
 }
 
-export default deleteCamion;
+export default deleteTrajet;
