@@ -15,9 +15,10 @@ const getInfo = async (req, res) => {
 
         // Fetch all camions for the enterprise
         const sqlCamionInfo = `
-            SELECT camion_id, num_carte_grise, type_camion, num_ctrl_tech_camion, date_ctrl_tech_camion 
-            FROM camion 
-            WHERE entreprise_id = ?`;
+            SELECT c.camion_id, c.num_carte_grise, c.type_camion, c.num_ctrl_tech_camion, c.date_ctrl_tech_camion, q.qrcode_img
+            FROM camion c
+            LEFT JOIN qr_code q ON c.camion_id = q.camion_id
+            WHERE c.entreprise_id = ?`;
         const [camionInfo] = await pool.query(sqlCamionInfo, [entreprise_id]);
 
 
@@ -63,6 +64,7 @@ const getInfo = async (req, res) => {
                 
                     // Construct the camion details object
                     const camionDetails = {
+                        qr_code: camion.qrcode_img,
                         camion_id : camion.camion_id,
                         num_carte_grise: camion.num_carte_grise,
                         type_camion: camion.type_camion,
