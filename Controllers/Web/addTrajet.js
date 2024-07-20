@@ -59,7 +59,7 @@ const AddTrajet = async (req, res) => {
             let photoConducteurUrl = null;
             if (photo_conducteur) {
                 const uploadResult = await cloudinary.uploader.upload(photo_conducteur, {
-                    folder: 'conducteur_photos'
+                    folder: 'TRANSPORTI/conducteur_photos'
                 });
                 photoConducteurUrl = uploadResult.secure_url;
             }
@@ -82,7 +82,7 @@ const AddTrajet = async (req, res) => {
             let pictogrammeUrl = null;
             if (pictogramme) {
                 const uploadResult = await cloudinary.uploader.upload(pictogramme, {
-                    folder: 'matiere_pictogrammes'
+                    folder: 'TRANSPORTI/matiere_pictogrammes'
                 });
                 pictogrammeUrl = uploadResult.secure_url;
             }

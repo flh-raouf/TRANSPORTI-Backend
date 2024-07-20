@@ -22,7 +22,7 @@ const generateCodeQr = async (data) => {
         
         // Upload QR code image to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(qrCodeUrl, {
-            folder: 'qrcodes', // Optional folder in Cloudinary
+            folder: 'TRANSPORTI/qrcodes', // Optional folder in Cloudinary
             resource_type: 'image' // Set resource type to image
         });
 
